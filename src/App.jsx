@@ -56,7 +56,7 @@ function App() {
 
   return (
     <div className="container">
-      <h1>Pokémon Explorer</h1>
+      <h1>Zayd's Pokémon Explorer</h1>
 
       <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
         <div style={{ flex: 1 }}>
