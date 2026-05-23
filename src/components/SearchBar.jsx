@@ -6,7 +6,6 @@ function SearchBar({ value, onChange, onSelect, hideSuggestions = false }) {
   const [list, setList] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [open, setOpen] = useState(false);
-  const [missed, setMissed] = useState(false);
   const fuseRef = useRef(null);
   const inputRef = useRef(null);
   const rootRef = useRef(null);
@@ -42,43 +41,8 @@ function SearchBar({ value, onChange, onSelect, hideSuggestions = false }) {
   useEffect(() => {
     if (hideSuggestions) {
       setOpen(false);
-      if (value && suggestions.length === 0) {
-        setMissed(true);
-      }
     }
-  }, [hideSuggestions, suggestions.length, value]);
-
-  useEffect(() => {
-    if (!open && value && suggestions.length === 0) {
-      setMissed(true);
-    }
-  }, [open, value, suggestions.length]);
-
-  useEffect(() => {
-    if (!missed) return;
-    playMissSound();
-    const id = window.setTimeout(() => setMissed(false), 600);
-    return () => window.clearTimeout(id);
-  }, [missed]);
-
-  function playMissSound() {
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(220, ctx.currentTime);
-      gain.gain.setValueAtTime(0.001, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.28);
-    } catch (e) {
-      // ignore audio errors
-    }
-  }
+  }, [hideSuggestions]);
 
   useEffect(() => {
     const el = document.createElement('div');
@@ -131,7 +95,7 @@ function SearchBar({ value, onChange, onSelect, hideSuggestions = false }) {
   );
 
   return (
-    <div className={`search-bar${missed ? ' missed' : ''}`} style={{ position: 'relative' }}>
+    <div className="search-bar" style={{ position: 'relative' }}>
       <input
         ref={inputRef}
         value={value}

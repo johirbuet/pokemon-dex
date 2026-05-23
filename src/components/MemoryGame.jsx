@@ -8,7 +8,7 @@ function shuffle(arr) {
   return arr;
 }
 
-function MemoryGame({ pairs = 6 }) {
+function MemoryGame({ pairs = 6, columns = 3, onClose }) {
   const [cards, setCards] = useState([]);
   const [first, setFirst] = useState(null);
   const [second, setSecond] = useState(null);
@@ -19,14 +19,17 @@ function MemoryGame({ pairs = 6 }) {
   const [showPoint, setShowPoint] = useState(false);
   const [mismatchIds, setMismatchIds] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [time, setTime] = useState(0);
+  const [remaining, setRemaining] = useState(0);
+  const [lost, setLost] = useState(false);
   const timerRef = useRef(null);
+  const totalRef = useRef(0);
+  const gameActiveRef = useRef(false);
 
   useEffect(() => {
+    // start or restart game whenever `pairs` (difficulty) changes
     startNewGame();
     return () => clearInterval(timerRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pairs]);
 
   useEffect(() => {
     if (first && second) {
@@ -43,9 +46,9 @@ function MemoryGame({ pairs = 6 }) {
         setTimeout(() => resetTurn(), 300);
         setMatches((m) => m + 1);
       } else {
-        // animate mismatch, play sound, then flip back
+        // animate mismatch, show both cards briefly, then play sound and flip back
         setMismatchIds([first.id, second.id]);
-        playMissSound();
+        setTimeout(() => playMissSound(), 120);
         setTimeout(() => {
           setCards((prev) => prev.map((c) => {
             if (c.matched) return c;
@@ -62,9 +65,14 @@ function MemoryGame({ pairs = 6 }) {
 
   useEffect(() => {
     if (matches === pairs && !loading) {
+      // mark game inactive and stop countdown to avoid a late timer tick setting `lost`
+      gameActiveRef.current = false;
       clearInterval(timerRef.current);
+      setDisabled(true);
     }
   }, [matches, pairs, loading]);
+
+  const finished = matches === pairs && !loading && !lost;
 
   function resetTurn() {
     setFirst(null);
@@ -113,7 +121,8 @@ function MemoryGame({ pairs = 6 }) {
   async function startNewGame() {
     setLoading(true);
     clearInterval(timerRef.current);
-    setTime(0);
+    setRemaining(0);
+    setLost(false);
     setMoves(0);
     setMatches(0);
     setFirst(null);
@@ -144,8 +153,32 @@ function MemoryGame({ pairs = 6 }) {
       setCards(set.map((c) => ({ ...c, flipped: false })));
       setLoading(false);
 
-      // start timer
-      timerRef.current = setInterval(() => setTime((t) => t + 1), 1000);
+      // start countdown timer based on difficulty (pairs)
+      function getTotalSeconds(p) {
+        if (p <= 6) return 60;
+        if (p <= 8) return 90;
+        if (p <= 12) return 120;
+        if (p <= 18) return 180;
+        return p * 10;
+      }
+      const total = getTotalSeconds(pairs);
+      totalRef.current = total;
+      setRemaining(total);
+      gameActiveRef.current = true;
+      timerRef.current = setInterval(() => {
+        setRemaining((r) => {
+          // don't mark lost if the game was finished/disabled in meantime
+          if (!gameActiveRef.current) return r;
+          if (r <= 1) {
+            clearInterval(timerRef.current);
+            gameActiveRef.current = false;
+            setLost(true);
+            setDisabled(true);
+            return 0;
+          }
+          return r - 1;
+        });
+      }, 1000);
     } catch (e) {
       console.error(e);
       setLoading(false);
@@ -164,6 +197,8 @@ function MemoryGame({ pairs = 6 }) {
   }
 
   function resetGame() {
+    setLost(false);
+    setDisabled(false);
     startNewGame();
   }
 
@@ -172,7 +207,7 @@ function MemoryGame({ pairs = 6 }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3 style={{ margin: 0 }}>Picture Memory</h3>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', position: 'relative' }}>
-          <div style={{ color: 'var(--muted)' }}>Time: {time}s</div>
+          <div style={{ color: 'var(--muted)' }}>Time Left: {remaining}s</div>
           <div style={{ color: 'var(--muted)' }}>Moves: {moves}</div>
           <div style={{ color: 'var(--muted)' }}>Score: {score}</div>
           <button onClick={resetGame}>Restart</button>
@@ -182,7 +217,7 @@ function MemoryGame({ pairs = 6 }) {
 
       {loading && <p>Loading game...</p>}
 
-      <div className="memory-grid" style={{ marginTop: 12 }}>
+      <div className="memory-grid" style={{ marginTop: 12, gridTemplateColumns: `repeat(${columns}, minmax(0, 110px))`, justifyContent: 'center', position: 'relative' }}>
         {cards.map((card) => (
           <div
             key={card.id}
@@ -202,6 +237,30 @@ function MemoryGame({ pairs = 6 }) {
           </div>
         ))}
       </div>
+      {finished && (
+        <div className="memory-win">
+          <div className="memory-win-card">
+            <h3>Congratulations — You Won!</h3>
+            <p style={{ margin: '6px 0' }}>Time Left: {remaining}s • Moves: {moves} • Score: {score}</p>
+            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+              <button onClick={resetGame}>Play Again</button>
+              <button onClick={() => onClose ? onClose() : resetGame()}>Quit</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {lost && (
+        <div className="memory-win">
+          <div className="memory-win-card">
+            <h3>Time's up — You Lost!</h3>
+            <p style={{ margin: '6px 0' }}>Moves: {moves} • Score: {score}</p>
+            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+              <button onClick={resetGame}>Play Again</button>
+              <button onClick={() => onClose ? onClose() : resetGame()}>Quit</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -21,6 +21,8 @@ function App() {
   });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showMemory, setShowMemory] = useState(false);
+  const [memoryTotalCards, setMemoryTotalCards] = useState(12);
+  const memoryColumns = memoryTotalCards === 12 ? 3 : memoryTotalCards === 16 ? 4 : memoryTotalCards === 24 ? 6 : 6;
 
   const fetchPokemon = async (name) => {
     try {
@@ -63,7 +65,16 @@ function App() {
           </div>
           {showMemory && (
             <div style={{ marginBottom: 12 }}>
-              <MemoryGame pairs={6} />
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
+                <label style={{ color: 'var(--muted)', fontSize: 14 }}>Difficulty:</label>
+                <select value={memoryTotalCards} onChange={(e) => setMemoryTotalCards(Number(e.target.value))}>
+                  <option value={12}>Easy — 3×4 (12 cards)</option>
+                  <option value={16}>Normal — 4×4 (16 cards)</option>
+                  <option value={24}>Hard — 6×4 (24 cards)</option>
+                  <option value={36}>Extreme — 6×6 (36 cards)</option>
+                </select>
+              </div>
+              <MemoryGame pairs={Math.floor(memoryTotalCards / 2)} columns={memoryColumns} onClose={() => setShowMemory(false)} />
             </div>
           )}
           <SearchBar

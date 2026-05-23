@@ -58,18 +58,6 @@ h1{
   transform: translateY(-1px);
 }
 
-.search-bar.missed input{
-  animation: shake 0.36s ease;
-  border-color: #ff6b6b;
-}
-
-@keyframes shake{
-  0%{ transform: translateX(0); }
-  25%{ transform: translateX(-6px); }
-  50%{ transform: translateX(6px); }
-  75%{ transform: translateX(-4px); }
-  100%{ transform: translateX(0); }
-}
 
 .suggestions{
   position: fixed;
@@ -138,11 +126,20 @@ button:hover{ transform: translateY(-3px); box-shadow: 0 8px 30px rgba(3,7,18,0.
 /* Memory game styles */
 .memory-grid{
   display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap:12px;
+  /* use fixed column widths so cards sit close together */
+  grid-template-columns: repeat(3, minmax(0, 110px));
+  gap:8px;
   justify-items:center;
+  justify-content: center;
+  /* colorful teal panel for better contrast */
+  background: linear-gradient(180deg, rgba(16,150,140,0.98), rgba(6,40,50,0.92));
+  border: 1px solid rgba(16,200,190,0.14);
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(6,40,50,0.8), 0 0 28px rgba(16,200,190,0.06) inset;
+  backdrop-filter: blur(10px) saturate(1.15);
 }
-.memory-card{ width:100px; height:120px; perspective: 800px; cursor:pointer }
+.memory-card{ width:96px; height:116px; perspective: 800px; cursor:pointer }
 .memory-card.mismatch .card-inner {
   animation: shake-card 0.45s ease-in-out;
 }
@@ -150,8 +147,18 @@ button:hover{ transform: translateY(-3px); box-shadow: 0 8px 30px rgba(3,7,18,0.
 .memory-card.flipped .card-inner{ transform: rotateY(180deg); }
 .memory-card .card-front,
 .memory-card .card-back{ position:absolute; inset:0; border-radius:10px; display:flex; align-items:center; justify-content:center; backface-visibility:hidden; overflow:hidden }
-.memory-card .card-front{ background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid var(--glass-border) }
-.memory-card .card-back{ transform: rotateY(180deg); background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); }
+.memory-card .card-front{
+  /* face-down cell: teal/dark accent to match panel */
+  background: linear-gradient(180deg, rgba(6,40,40,0.95), rgba(16,120,110,0.9));
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45) inset;
+}
+.memory-card .card-back{
+  /* face-up cell: light surface so images pop */
+  transform: rotateY(180deg);
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,247,248,0.98));
+  border: 1px solid rgba(6,40,50,0.08);
+}
 .memory-card img{ width:84px; height:84px; object-fit:contain }
 
 @keyframes shake-card {
@@ -165,7 +172,7 @@ button:hover{ transform: translateY(-3px); box-shadow: 0 8px 30px rgba(3,7,18,0.
 
 @media (max-width:600px){
   .memory-grid{ grid-template-columns: repeat(3, 1fr); }
-  .memory-card{ width:80px; height:100px }
+  .memory-card{ width:78px; height:96px }
 }
 
 /* match animation and point badge */
@@ -184,6 +191,25 @@ button:hover{ transform: translateY(-3px); box-shadow: 0 8px 30px rgba(3,7,18,0.
 @media (max-width:900px){
   .main-grid{ grid-template-columns: 1fr; }
   .card img{ width:120px; height:120px }
+}
+
+/* win overlay for memory game */
+.memory-win{
+  position: absolute;
+  inset: 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(2,6,23,0.6);
+  z-index: 9999;
+}
+.memory-win-card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  border: 1px solid var(--glass-border);
+  padding: 18px 22px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
 }
 
 /* small helpers */
