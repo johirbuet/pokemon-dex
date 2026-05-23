@@ -37,6 +37,11 @@ h1{
   text-shadow: 0 4px 18px var(--card-glow);
 }
 
+.search-bar {
+  position: relative;
+  z-index: 2147483647 !important;
+}
+
 .search-bar input, .search input{
   width: 100%;
   padding: 12px 14px;
@@ -53,25 +58,38 @@ h1{
   transform: translateY(-1px);
 }
 
+.search-bar.missed input{
+  animation: shake 0.36s ease;
+  border-color: #ff6b6b;
+}
+
+@keyframes shake{
+  0%{ transform: translateX(0); }
+  25%{ transform: translateX(-6px); }
+  50%{ transform: translateX(6px); }
+  75%{ transform: translateX(-4px); }
+  100%{ transform: translateX(0); }
+}
+
 .suggestions{
-  position: absolute;
-  left: 0;
-  right: 0;
-  margin-top: 8px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
+  position: fixed;
+  background: rgba(6, 18, 38, 0.98);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: var(--shadow);
-  z-index: 40;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  z-index: 2147483647;
+  backdrop-filter: blur(16px);
 }
 
 .suggestions li{
-  padding: 8px 12px;
+  padding: 10px 14px;
   cursor: pointer;
-  color: var(--muted);
+  color: #edf2ff;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
-.suggestions li:hover{ background: rgba(255,255,255,0.02); }
+.suggestions li:last-child{ border-bottom: none; }
+.suggestions li:hover{ background: rgba(255,255,255,0.08); }
 
 .main-grid{
   display: grid;
@@ -109,13 +127,58 @@ h1{
 button{ background: linear-gradient(90deg, rgba(255,203,5,0.15), rgba(255,203,5,0.08)); border:1px solid rgba(255,203,5,0.12); color:var(--accent); padding:8px 12px; border-radius:10px; cursor:pointer; }
 button:hover{ transform: translateY(-3px); box-shadow: 0 8px 30px rgba(3,7,18,0.6); }
 
-.compare{ background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005)); padding:12px; border-radius:12px; border:1px solid var(--glass-border); }
+.compare{ position: relative; z-index: 0 !important; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005)); padding:12px; border-radius:12px; border:1px solid var(--glass-border); }
 
 .evolution-chain{ margin-top:12px; }
 
 .error{ color:#ff6b6b; font-weight:600; }
 
 .panel-toggle button{ padding:6px 8px; font-size:13px }
+
+/* Memory game styles */
+.memory-grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:12px;
+  justify-items:center;
+}
+.memory-card{ width:100px; height:120px; perspective: 800px; cursor:pointer }
+.memory-card.mismatch .card-inner {
+  animation: shake-card 0.45s ease-in-out;
+}
+.memory-card .card-inner{ position:relative; width:100%; height:100%; transition: transform 0.5s; transform-style:preserve-3d }
+.memory-card.flipped .card-inner{ transform: rotateY(180deg); }
+.memory-card .card-front,
+.memory-card .card-back{ position:absolute; inset:0; border-radius:10px; display:flex; align-items:center; justify-content:center; backface-visibility:hidden; overflow:hidden }
+.memory-card .card-front{ background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid var(--glass-border) }
+.memory-card .card-back{ transform: rotateY(180deg); background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); }
+.memory-card img{ width:84px; height:84px; object-fit:contain }
+
+@keyframes shake-card {
+  0% { transform: translateX(0) scale(1); }
+  20% { transform: translateX(-5px) scale(1.02); }
+  40% { transform: translateX(5px) scale(1.02); }
+  60% { transform: translateX(-4px) scale(1.01); }
+  80% { transform: translateX(4px) scale(1.01); }
+  100% { transform: translateX(0) scale(1); }
+}
+
+@media (max-width:600px){
+  .memory-grid{ grid-template-columns: repeat(3, 1fr); }
+  .memory-card{ width:80px; height:100px }
+}
+
+/* match animation and point badge */
+.memory-card.matched .card-inner{ animation: match-pop .9s ease; box-shadow: 0 8px 30px rgba(255,203,5,0.14); }
+@keyframes match-pop{
+  0%{ transform: scale(1) }
+  30%{ transform: scale(1.06) }
+  100%{ transform: scale(1) }
+}
+
+.point-badge{ position:absolute; right:6px; top:-6px; background:var(--accent); color:#08121a; padding:6px 10px; border-radius:999px; font-weight:700; box-shadow: 0 6px 20px rgba(255,203,5,0.12); animation: pop .7s ease; }
+@keyframes pop{ 0%{ transform: scale(.6); opacity:0 } 50%{ transform: scale(1.08); opacity:1 } 100%{ transform: scale(1); opacity:0 } }
+
 
 
 @media (max-width:900px){

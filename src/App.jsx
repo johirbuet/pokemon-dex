@@ -3,6 +3,7 @@ import PokemonCard from './components/PokemonCard';
 import SearchBar from './components/SearchBar';
 import Favorites from './components/Favorites';
 import CompareView from './components/CompareView';
+import MemoryGame from './components/MemoryGame';
 import './App.css';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
     }
   });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showMemory, setShowMemory] = useState(false);
 
   const fetchPokemon = async (name) => {
     try {
@@ -56,9 +58,18 @@ function App() {
 
       <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
         <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+            <button onClick={() => setShowMemory((s) => !s)}>{showMemory ? 'Close Game' : 'Play Memory Game'}</button>
+          </div>
+          {showMemory && (
+            <div style={{ marginBottom: 12 }}>
+              <MemoryGame pairs={6} />
+            </div>
+          )}
           <SearchBar
             value={pokemonName}
             onChange={setPokemonName}
+            hideSuggestions={showMemory}
             onSelect={(val) => {
               setPokemonName(val);
               fetchPokemon(val);
