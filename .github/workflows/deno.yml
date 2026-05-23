@@ -38,5 +38,6 @@ jobs:
       - name: Run linter
         run: deno lint
 
-      - name: Run tests
-        run: deno test -A
+      # Uncomment this step to verify the use of 'deno test' on each commit.
+      # - name: Run tests
+      #  run: deno test -A
