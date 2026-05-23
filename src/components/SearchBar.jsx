@@ -69,11 +69,11 @@ function SearchBar({ value, onChange, onSelect, hideSuggestions = false }) {
     }
 
     updatePos();
-    window.addEventListener('resize', updatePos);
-    window.addEventListener('scroll', updatePos, true);
+    globalThis.addEventListener('resize', updatePos);
+    globalThis.addEventListener('scroll', updatePos, true);
     return () => {
-      window.removeEventListener('resize', updatePos);
-      window.removeEventListener('scroll', updatePos, true);
+      globalThis.removeEventListener('resize', updatePos);
+      globalThis.removeEventListener('scroll', updatePos, true);
     };
   }, [open, suggestions]);
 

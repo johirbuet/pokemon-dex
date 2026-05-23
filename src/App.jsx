@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import PokemonCard from './components/PokemonCard';
 import SearchBar from './components/SearchBar';
 import Favorites from './components/Favorites';

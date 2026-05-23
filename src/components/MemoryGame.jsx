@@ -82,7 +82,7 @@ function MemoryGame({ pairs = 6, columns = 3, onClose }) {
 
   function playMatchSound() {
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const ctx = new (globalThis.AudioContext || globalThis.webkitAudioContext)();
       const o = ctx.createOscillator();
       const g = ctx.createGain();
       o.type = 'sine';
@@ -94,14 +94,14 @@ function MemoryGame({ pairs = 6, columns = 3, onClose }) {
       o.start();
       g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
       o.stop(ctx.currentTime + 0.36);
-    } catch (e) {
+    } catch (_e) {
       // ignore audio errors
     }
   }
 
   function playMissSound() {
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const ctx = new (globalThis.AudioContext || globalThis.webkitAudioContext)();
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'triangle';
@@ -113,7 +113,7 @@ function MemoryGame({ pairs = 6, columns = 3, onClose }) {
       gain.connect(ctx.destination);
       osc.start();
       osc.stop(ctx.currentTime + 0.22);
-    } catch (e) {
+    } catch (_e) {
       // ignore audio errors
     }
   }
@@ -142,7 +142,7 @@ function MemoryGame({ pairs = 6, columns = 3, onClose }) {
       const selected = list.slice(0, pairs);
 
       // build card set
-      let set = [];
+      const set = [];
       selected.forEach((p) => {
         const image = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.id}.png`;
         set.push({ id: `${p.name}-a`, pokemon: p.name, image, matched: false });
@@ -154,13 +154,6 @@ function MemoryGame({ pairs = 6, columns = 3, onClose }) {
       setLoading(false);
 
       // start countdown timer based on difficulty (pairs)
-      function getTotalSeconds(p) {
-        if (p <= 6) return 60;
-        if (p <= 8) return 90;
-        if (p <= 12) return 120;
-        if (p <= 18) return 180;
-        return p * 10;
-      }
       const total = getTotalSeconds(pairs);
       totalRef.current = total;
       setRemaining(total);
@@ -179,10 +172,18 @@ function MemoryGame({ pairs = 6, columns = 3, onClose }) {
           return r - 1;
         });
       }, 1000);
-    } catch (e) {
-      console.error(e);
+    } catch (_e) {
+      // error fetching pokemon
       setLoading(false);
     }
+  }
+
+  function getTotalSeconds(p) {
+    if (p <= 6) return 60;
+    if (p <= 8) return 90;
+    if (p <= 12) return 120;
+    if (p <= 18) return 180;
+    return p * 10;
   }
 
   function handleFlip(card) {

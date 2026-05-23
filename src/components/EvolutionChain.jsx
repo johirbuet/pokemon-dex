@@ -51,7 +51,7 @@ function EvolutionChain({ speciesUrl }) {
 
         if (!mounted) return;
         setChain(items);
-      } catch (e) {
+      } catch (_e) {
         if (!mounted) return;
         setChain([]);
       } finally {

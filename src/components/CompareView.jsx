@@ -16,7 +16,9 @@ function CompareView({ onFetch }) {
       const r = await onFetch(right);
       setDataLeft(l);
       setDataRight(r);
-    } catch (e) {}
+    } catch (_e) {
+      // ignore errors
+    }
     setLoading(false);
   };
 
