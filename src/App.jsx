@@ -14,7 +14,8 @@ function App() {
       setError('');
       setPokemonData(null);
 
-      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`);
+      const query = String(name).toLowerCase();
+      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${query}`);
       if (!res.ok) throw new Error('Pokémon not found');
 
       const data = await res.json();
