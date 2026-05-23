@@ -1,0 +1,43 @@
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+}
+
+.container {
+  text-align: center;
+  padding: 40px;
+}
+
+.search input {
+  padding: 10px;
+  margin: 10px;
+}
+
+.search button {
+  padding: 10px;
+  margin: 5px;
+  cursor: pointer;
+  background: #4caf50;
+  color: white;
+  border: none;
+}
+
+.card {
+  margin: 20px auto;
+  padding: 20px;
+  width: 320px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.types span {
+  margin: 5px;
+  padding: 5px 10px;
+  background: #eee;
+  border-radius: 12px;
+}
+
+.error {
+  color: red;
+}
